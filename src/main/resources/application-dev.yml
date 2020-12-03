@@ -1,0 +1,20 @@
+server:
+  servlet.context-path: /shop
+  port: 8001
+
+# Keycloak configuration
+keycloak:
+  auth-server-url: http://auth.nearmi-dev/auth
+  realm: nearmi-dev
+  bearerOnly: true
+  ssl-required: external
+  resource: nearmi-back
+  cors: false
+  confidential-port: 0
+# Mongodb configuration
+nearmi:
+  config:
+    dbName: 'nearmi-dev'
+    dbUsername: 'nearmi-dev'
+    dbPassword: 'dev@password'
+    cluster: 'cluster0.kvkgz.mongodb.net'

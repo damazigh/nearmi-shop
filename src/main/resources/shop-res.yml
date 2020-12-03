@@ -1,0 +1,4 @@
+- key: 'NMI_S_0001'
+  message: 'Incoherent value detected'
+  description: "Opening time '%s' cannot be previous closure '%s'"
+  status: 400
