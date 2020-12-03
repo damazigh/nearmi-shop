@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication
 @ComponentScan("org.nearmi")
-@EnableMongoRepositories
+@EnableMongoRepositories({"org.nearmi.core.repository", "org.nearmi.shop.repository"})
 public class ShopApplication {
 
     public static void main(String [] args) {
