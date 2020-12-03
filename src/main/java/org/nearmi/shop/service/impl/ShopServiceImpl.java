@@ -1,12 +1,15 @@
 package org.nearmi.shop.service.impl;
 
 import org.nearmi.core.mongo.document.MiProUser;
+import org.nearmi.core.mongo.document.MiUser;
 import org.nearmi.core.mongo.document.shopping.Address;
 import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.core.mongo.document.shopping.ShopOptions;
+import org.nearmi.core.repository.AddressRepository;
 import org.nearmi.core.repository.CoreUserRepository;
 import org.nearmi.core.security.CoreSecurity;
 import org.nearmi.shop.dto.ShopDto;
+import org.nearmi.shop.repository.ShopOptionsRepository;
 import org.nearmi.shop.repository.ShopRepository;
 import org.nearmi.shop.rest.ShopResKey;
 import org.nearmi.shop.service.IShopService;
@@ -22,6 +25,10 @@ public class ShopServiceImpl implements IShopService {
     private CoreUserRepository<MiProUser> proUserRepo;
     @Autowired
     private ShopRepository shopRepository;
+    @Autowired
+    private ShopOptionsRepository shopOptionsRepository;
+    @Autowired
+    private AddressRepository addressRepository;
 
     public void create(ShopDto shopDto) {
         notNull(shopDto, "shop");
@@ -38,7 +45,7 @@ public class ShopServiceImpl implements IShopService {
             validateClosureTimeCoherence(shopDto.getBreakClosureStart(), shopDto.getBreakClosureEnd(), ShopResKey.NMI_S_0001);
         }
         validateAddress(shopDto.getAddress());
-        MiProUser proUser = proUserRepo.findByUsername(CoreSecurity.getAttribute("username"));
+        MiUser proUser = proUserRepo.findByUsername(CoreSecurity.getAttribute("username"));
 
         Shop shop = new Shop();
         shop.setName(shopDto.getName());
@@ -57,6 +64,7 @@ public class ShopServiceImpl implements IShopService {
             options.setBreakClosureEnd(shopDto.getBreakClosureEnd());
         }
         options.setSchedulingAppointment(shopDto.isSchedulingAppointment());
+        shopOptionsRepository.save(options);
         shop.setOptions(options);
 
         // address
@@ -68,6 +76,7 @@ public class ShopServiceImpl implements IShopService {
         address.setLine2(shopDto.getAddress().getLine2());
         address.setLongitude(shopDto.getAddress().getLongitude());
         address.setLatitude(shopDto.getAddress().getLatitude());
+        addressRepository.save(address);
         shop.setAddress(address);
         shopRepository.save(shop);
     }
