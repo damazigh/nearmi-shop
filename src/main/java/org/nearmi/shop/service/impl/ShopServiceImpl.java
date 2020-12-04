@@ -1,5 +1,6 @@
 package org.nearmi.shop.service.impl;
 
+import org.nearmi.core.dto.technical.PaginatedSearchResult;
 import org.nearmi.core.mongo.document.MiProUser;
 import org.nearmi.core.mongo.document.MiUser;
 import org.nearmi.core.mongo.document.shopping.Address;
@@ -9,12 +10,17 @@ import org.nearmi.core.repository.AddressRepository;
 import org.nearmi.core.repository.CoreUserRepository;
 import org.nearmi.core.security.CoreSecurity;
 import org.nearmi.shop.dto.ShopDto;
+import org.nearmi.shop.dto.in.SearchShopDto;
 import org.nearmi.shop.repository.ShopOptionsRepository;
 import org.nearmi.shop.repository.ShopRepository;
 import org.nearmi.shop.rest.ShopResKey;
 import org.nearmi.shop.service.IShopService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+
 import static org.nearmi.core.validator.Validator.notEmpty;
 import static org.nearmi.core.validator.Validator.notNull;
 import static org.nearmi.core.validator.Validator.validateAddress;
@@ -79,6 +85,16 @@ public class ShopServiceImpl implements IShopService {
         addressRepository.save(address);
         shop.setAddress(address);
         shopRepository.save(shop);
+    }
+
+    @Override
+    public PaginatedSearchResult<Shop> search(SearchShopDto searchShopDto, Pageable pageable) {
+        if (CoreSecurity.isAuthenticated()) {
+            //TODO implement a search based on user + crtiera
+        } else {
+
+        }
+        return PaginatedSearchResult.of(shopRepository.findAll(pageable));
     }
 
     private void isValidRegistrationNumber(String registrationNumber) {
