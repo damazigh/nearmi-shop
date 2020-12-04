@@ -6,24 +6,23 @@ import org.nearmi.shop.dto.ShopDto;
 import org.nearmi.shop.dto.in.SearchShopDto;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
-
 /**
  * contains business method for managing, creating, deleting a shop
+ *
  * @author adjebarri
  * @since 0.1.0
  */
 public interface IShopService {
     /**
-     *
      * @param shop an object that holds shop properties
      */
     void create(ShopDto shop);
 
     /**
      * method that allows to search for shop by criteria
+     *
      * @param searchShopDto object that holds criteria
-     * @param pageable pagination limit and offset
+     * @param pageable      pagination limit and offset
      * @return a collection of {@link Shop} matching search criteria
      */
     PaginatedSearchResult<Shop> search(SearchShopDto searchShopDto, Pageable pageable);
