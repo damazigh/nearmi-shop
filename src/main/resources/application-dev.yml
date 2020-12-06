@@ -20,3 +20,13 @@ nearmi:
     dbPassword: 'dev@password'
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
+    max-distance: 10000.0
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

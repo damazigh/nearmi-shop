@@ -17,14 +17,14 @@ import org.nearmi.shop.rest.ShopResKey;
 import org.nearmi.shop.service.IShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
-import static org.nearmi.core.validator.Validator.notEmpty;
-import static org.nearmi.core.validator.Validator.notNull;
-import static org.nearmi.core.validator.Validator.validateAddress;
+import static org.nearmi.core.validator.Validator.*;
 import static org.nearmi.shop.validator.ShopValidator.validateClosureTimeCoherence;
+
 @Service
 public class ShopServiceImpl implements IShopService {
     @Autowired
@@ -36,11 +36,12 @@ public class ShopServiceImpl implements IShopService {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Override
     public void create(ShopDto shopDto) {
         notNull(shopDto, "shop");
         notEmpty(shopDto.getRegistrationNumber(), "shop registration umber");
         isValidRegistrationNumber(shopDto.getRegistrationNumber());
-        notEmpty(shopDto.getName(),"shop name");
+        notEmpty(shopDto.getName(), "shop name");
         notNull(shopDto.getOpensAt(), "shop opens at");
         notNull(shopDto.getClosesAt(), "shop closes at");
         notNull(shopDto.getAddress(), "shop address");
@@ -57,6 +58,7 @@ public class ShopServiceImpl implements IShopService {
         shop.setName(shopDto.getName());
         shop.setDescription(shopDto.getDescription());
         shop.setShortDesc(shopDto.getShortDescription());
+        shop.setRegistrationNumber(shopDto.getRegistrationNumber());
 
         // shop options
         ShopOptions options = new ShopOptions();
@@ -80,8 +82,8 @@ public class ShopServiceImpl implements IShopService {
         address.setPostalCode(shopDto.getAddress().getPostalCode());
         address.setLine1(shopDto.getAddress().getLine1());
         address.setLine2(shopDto.getAddress().getLine2());
-        address.setLongitude(shopDto.getAddress().getLongitude());
-        address.setLatitude(shopDto.getAddress().getLatitude());
+        Point point = new Point(shopDto.getAddress().getLongitude(), shopDto.getAddress().getLatitude());
+        address.setLocation(point);
         addressRepository.save(address);
         shop.setAddress(address);
         shopRepository.save(shop);
@@ -89,12 +91,17 @@ public class ShopServiceImpl implements IShopService {
 
     @Override
     public PaginatedSearchResult<Shop> search(SearchShopDto searchShopDto, Pageable pageable) {
+        notNull(searchShopDto.getAddress(), "address");
         if (CoreSecurity.isAuthenticated()) {
             //TODO implement a search based on user + crtiera
         } else {
 
         }
-        return PaginatedSearchResult.of(shopRepository.findAll(pageable));
+        Collection<Address> addresses = addressRepository.findByLocation(searchShopDto.getAddress().getLongitude(), searchShopDto.getAddress().getLatitude());
+        if (addresses != null && !addresses.isEmpty()) {
+            return PaginatedSearchResult.of(shopRepository.findByAddressesIds(addresses, pageable));
+        }
+        return PaginatedSearchResult.of(null);
     }
 
     private void isValidRegistrationNumber(String registrationNumber) {
