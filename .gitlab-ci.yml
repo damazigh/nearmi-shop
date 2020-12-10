@@ -4,7 +4,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
   APP_IMAGE_NAME: "nearmi.io/nearmi-dev/user"
   DOCKER_TLS_CERTDIR: "/certs"
-
+  JAR_ARTIFACT: "shop*.jar"
 services:
   - docker:19.03.12-dind
 cache:
@@ -41,7 +41,7 @@ package:
   artifacts:
     paths:
       - version.info
-      - ./target/user*.jar
+      - ./target/${JAR_ARTIFACT}
     expire_in: 1 days
   tags:
     - docker
