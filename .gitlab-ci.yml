@@ -2,7 +2,7 @@ image: maven:3.6.3-adoptopenjdk-14
 variables:
   CUSTOM_MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
-  APP_IMAGE_NAME: "nearmi.io/nearmi-dev/user"
+  APP_IMAGE_NAME: "nearmi.io/nearmi-dev/shop"
   DOCKER_TLS_CERTDIR: "/certs"
   JAR_ARTIFACT: "shop*.jar"
 services:
