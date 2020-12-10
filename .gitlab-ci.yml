@@ -1,0 +1,62 @@
+image: maven:3.6.3-adoptopenjdk-14
+variables:
+  CUSTOM_MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
+  APP_IMAGE_NAME: "nearmi.io/nearmi-dev/user"
+  DOCKER_TLS_CERTDIR: "/certs"
+
+services:
+  - docker:19.03.12-dind
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+build:
+  stage: build
+  script:
+    - echo "cleaning and building project... "
+    - mvn ${CUSTOM_MAVEN_CLI_OPTS} clean compile
+  tags:
+    - docker
+test:
+  stage: test
+  script:
+    - echo "executing tests"
+    - mvn ${CUSTOM_MAVEN_CLI_OPTS} test
+  tags:
+    - docker
+package:
+  image: maven:3.6.3-adoptopenjdk-14
+  stage: package
+  script:
+    - mvn ${CUSTOM_MAVEN_CLI_OPTS} package -DskipTests=true
+    - TAG=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
+    - echo $TAG > version.info
+  artifacts:
+    paths:
+      - version.info
+      - ./target/user*.jar
+    expire_in: 1 days
+  tags:
+    - docker
+deploy:
+  image: docker:19.03.12
+  stage: deploy
+  dependencies:
+    - package
+  before_script:
+    - echo "${NEXUS_PASSWORD}" | docker login -u "${NEXUS_LOGIN}" "nearmi.io" --password-stdin
+  script:
+    - ls -lart
+    - TAG=$(cat version.info)
+    - docker build -f Dockerfile -t ${APP_IMAGE_NAME}:${TAG} --build-arg VERSION=${TAG} .
+    - docker push ${APP_IMAGE_NAME}:${TAG}
+  tags:
+    - docker
+
