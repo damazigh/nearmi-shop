@@ -9,7 +9,7 @@ variables:
 cache:
   paths:
     - .m2/repository/
-  key: "nearmi_user_maven"
+  key: "nearmi_shop_maven"
 stages:
   - build
   - test
