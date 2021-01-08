@@ -2,15 +2,14 @@ image: maven:3.6.3-adoptopenjdk-14
 variables:
   CUSTOM_MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
-  APP_IMAGE_NAME: "nearmi.io/nearmi-dev/shop"
+  APP_IMAGE_NAME: "nearmi.registry/nearmi/shop"
   DOCKER_TLS_CERTDIR: "/certs"
   JAR_ARTIFACT: "shop*.jar"
-services:
-  - docker:19.03.12-dind
+
 cache:
   paths:
     - .m2/repository/
-    - target/
+  key: "nearmi_user_maven"
 stages:
   - build
   - test
@@ -23,14 +22,14 @@ build:
     - echo "cleaning and building project... "
     - mvn ${CUSTOM_MAVEN_CLI_OPTS} clean compile
   tags:
-    - docker
+    - kubernetes
 test:
   stage: test
   script:
     - echo "executing tests"
     - mvn ${CUSTOM_MAVEN_CLI_OPTS} test
   tags:
-    - docker
+    - kubernetes
 package:
   image: maven:3.6.3-adoptopenjdk-14
   stage: package
@@ -44,19 +43,28 @@ package:
       - ./target/${JAR_ARTIFACT}
     expire_in: 1 days
   tags:
-    - docker
+    - kubernetes
 deploy:
-  image: docker:19.03.12
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
   stage: deploy
   dependencies:
     - package
   before_script:
-    - echo "${NEXUS_PASSWORD}" | docker login -u "${NEXUS_LOGIN}" "nearmi.io" --password-stdin
+    - cp /conf/rootCA.crt /kaniko/ssl/certs/
   script:
-    - ls -lart
-    - TAG=$(cat version.info)
-    - docker build -f Dockerfile -t ${APP_IMAGE_NAME}:${TAG} --build-arg VERSION=${TAG} .
-    - docker push ${APP_IMAGE_NAME}:${TAG}
+    - |
+      TAG=$(cat version.info);
+      PROFILE="dev";
+      if [[ ! -z ${TARGET_ENV} ]];
+      then
+        PROFILE="${TARGET_ENV}";
+      fi
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"nearmi.registry\":{\"username\":\"${NEXUS_LOGIN}\",\"password\":\"${NEXUS_PASSWORD}\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --build-arg VERSION="${TAG}" --build-arg PROFILE="${PROFILE}" --destination ${APP_IMAGE_NAME}:${TAG}
+
   tags:
-    - docker
+    - kubernetes
 
