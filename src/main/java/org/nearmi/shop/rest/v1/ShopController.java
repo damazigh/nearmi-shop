@@ -1,4 +1,4 @@
-package org.nearmi.shop.rest;
+package org.nearmi.shop.rest.v1;
 
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
 import org.nearmi.core.mongo.document.shopping.Shop;
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +29,7 @@ import static org.nearmi.core.util.HttpUtils.parsePaginationParam;
  * @since 0.1.0
  */
 @RestController
+@RequestMapping("/api/v1")
 public class ShopController {
     @Autowired
     private IShopService shopService;
