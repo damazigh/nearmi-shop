@@ -1,5 +1,5 @@
 server:
-  servlet.context-path: /shop
+  servlet.context-path: /api
   port: 8001
 
 

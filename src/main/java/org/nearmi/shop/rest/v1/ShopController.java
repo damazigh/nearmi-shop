@@ -29,7 +29,7 @@ import static org.nearmi.core.util.HttpUtils.parsePaginationParam;
  * @since 0.1.0
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/shop/v1")
 public class ShopController {
     @Autowired
     private IShopService shopService;
