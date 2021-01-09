@@ -15,7 +15,7 @@ public class ShopSecurityConfig extends SecurityConfig {
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.csrf().disable().authorizeRequests()
-                .antMatchers("/search")
+                .antMatchers("/shop/v1/search")
                 .permitAll().anyRequest().authenticated();
     }
 }
