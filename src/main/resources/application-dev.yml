@@ -2,10 +2,9 @@ server:
   servlet.context-path: /api
   port: 8001
 
-
 # Keycloak configuration
 keycloak:
-  auth-server-url: http://auth.nearmi-dev/auth
+  auth-server-url: https://cluster.nearmi-dev/auth
   realm: nearmi-dev
   bearerOnly: true
   ssl-required: external
@@ -21,6 +20,9 @@ nearmi:
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
     max-distance: 10000.0
+  cors:
+    allowedOrigins: 'http://localhost:3000'
+    allowedMethods: 'GET, PUT, POST, OPTIONS, HEAD'
 
 logging:
   level:

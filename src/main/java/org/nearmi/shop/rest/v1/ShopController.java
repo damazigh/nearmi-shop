@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import static org.nearmi.core.util.HttpUtils.parsePaginationParam;
  */
 @RestController
 @RequestMapping("/shop/v1")
+@CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
 public class ShopController {
     @Autowired
     private IShopService shopService;
