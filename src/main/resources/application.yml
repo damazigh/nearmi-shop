@@ -1,0 +1,31 @@
+server:
+  servlet.context-path: /api
+  port: 8001
+
+# Keycloak configuration
+keycloak:
+  auth-server-url: http://keycloak.nearmi.svc.cluster.local:8080/auth
+  realm: nearmi-dev
+  bearerOnly: true
+  ssl-required: external
+  resource: nearmi-back
+  cors: false
+  confidential-port: 0
+# app configuration (mongo + override security)
+nearmi:
+  config:
+    dbName: 'nearmi-dev'
+    dbUsername: 'nearmi-dev'
+    dbPassword: 'dev@password'
+    cluster: 'cluster0.kvkgz.mongodb.net'
+    override-security: true
+    max-distance: 10000.0
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
