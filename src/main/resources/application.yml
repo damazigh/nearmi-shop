@@ -4,7 +4,7 @@ server:
 
 # Keycloak configuration
 keycloak:
-  auth-server-url: https://cluster.nearmi-dev/auth
+  auth-server-url: http://keycloak.nearmi.svc.cluster.local:8080/auth
   realm: nearmi-dev
   bearerOnly: true
   ssl-required: external
@@ -20,6 +20,7 @@ nearmi:
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
     max-distance: 10000.0
+    debugSecurity: true
 
 logging:
   level:
