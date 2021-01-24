@@ -5,7 +5,7 @@ server:
 # Keycloak configuration
 keycloak:
   # when using self signed certificate => use a special http vhost to avoid handling java pkix (untrusted root ca)
-  auth-server-url: http://keycloak.untrusted.certificate/auth
+  auth-server-url: https://cluster.nearmi-dev/auth
   realm: nearmi-dev
   bearerOnly: true
   ssl-required: external

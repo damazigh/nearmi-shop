@@ -4,7 +4,7 @@ server:
 
 # Keycloak configuration
 keycloak:
-  auth-server-url: http://keycloak.nearmi.svc.cluster.local:8080/auth
+  auth-server-url: https://cluster.nearmi-dev/auth
   realm: nearmi-dev
   bearerOnly: true
   ssl-required: external
