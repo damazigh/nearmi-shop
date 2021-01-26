@@ -18,4 +18,5 @@ public interface ShopCustomRepository {
      * @param addresses addresses id that match a certain perimeter (see {@code nearmi.config.max-distance}
      */
     Page<Shop> findByAddressesIds(Collection<Address> addresses, Pageable pageable);
+    
 }

@@ -1,6 +1,11 @@
 server:
   servlet.context-path: /api
   port: 8001
+#Max file upload 5mb
+spring:
+  http:
+    multipart:
+      max-file-size: 5MB
 
 # Keycloak configuration
 keycloak:
@@ -21,7 +26,9 @@ nearmi:
     override-security: true
     max-distance: 10000.0
     debugSecurity: true
-
+    acceptedImageMime:
+      - 'image/jpeg'
+      - 'image/png'
 logging:
   level:
     org:

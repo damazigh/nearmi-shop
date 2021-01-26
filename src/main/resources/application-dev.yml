@@ -1,6 +1,11 @@
 server:
   servlet.context-path: /api
   port: 8001
+# max upload file size
+spring:
+  http:
+    multipart:
+      max-file-size: 5MB
 
 # Keycloak configuration
 keycloak:
@@ -12,6 +17,7 @@ keycloak:
   resource: nearmi-back
   cors: false
   confidential-port: 0
+
 # app configuration (mongo + override security)
 nearmi:
   config:
@@ -21,9 +27,10 @@ nearmi:
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
     max-distance: 10000.0
-  cors:
-    allowedOrigins: 'http://localhost:3000'
-    allowedMethods: 'GET, PUT, POST, OPTIONS, HEAD'
+    #accepted mime type for images
+    acceptedImageMime:
+      - 'image/jpeg'
+      - 'image/png'
 
 logging:
   level:
@@ -33,3 +40,4 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+      nearmi: DEBUG

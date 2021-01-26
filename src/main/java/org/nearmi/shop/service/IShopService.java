@@ -5,6 +5,7 @@ import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.shop.dto.ShopDto;
 import org.nearmi.shop.dto.in.SearchShopDto;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * contains business method for managing, creating, deleting a shop
@@ -26,4 +27,11 @@ public interface IShopService {
      * @return a collection of {@link Shop} matching search criteria
      */
     PaginatedSearchResult<Shop> search(SearchShopDto searchShopDto, Pageable pageable);
+
+    /**
+     * update shop image
+     *
+     * @param file
+     */
+    void updateImage(MultipartFile file, String shopId);
 }

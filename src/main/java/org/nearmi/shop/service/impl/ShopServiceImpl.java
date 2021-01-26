@@ -1,24 +1,28 @@
 package org.nearmi.shop.service.impl;
 
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
+import org.nearmi.core.exception.MiException;
 import org.nearmi.core.mongo.document.MiProUser;
-import org.nearmi.core.mongo.document.MiUser;
 import org.nearmi.core.mongo.document.shopping.Address;
 import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.core.mongo.document.shopping.ShopOptions;
 import org.nearmi.core.repository.AddressRepository;
 import org.nearmi.core.repository.CoreUserRepository;
 import org.nearmi.core.security.CoreSecurity;
+import org.nearmi.core.service.impl.UploadService;
 import org.nearmi.shop.dto.ShopDto;
 import org.nearmi.shop.dto.in.SearchShopDto;
 import org.nearmi.shop.repository.ShopOptionsRepository;
 import org.nearmi.shop.repository.ShopRepository;
 import org.nearmi.shop.rest.ShopResKey;
 import org.nearmi.shop.service.IShopService;
+import org.nearmi.shop.validator.ShopValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 
@@ -35,24 +39,31 @@ public class ShopServiceImpl implements IShopService {
     private ShopOptionsRepository shopOptionsRepository;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private UploadService uploadService;
+    @Autowired
+    private Environment env;
+
 
     @Override
     public void create(ShopDto shopDto) {
+
+        MiProUser proUser = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
         notNull(shopDto, "shop");
-        notEmpty(shopDto.getRegistrationNumber(), "shop registration umber");
+        notEmpty(shopDto.getRegistrationNumber(), "shop registration number");
         isValidRegistrationNumber(shopDto.getRegistrationNumber());
         notEmpty(shopDto.getName(), "shop name");
         notNull(shopDto.getOpensAt(), "shop opens at");
         notNull(shopDto.getClosesAt(), "shop closes at");
         notNull(shopDto.getAddress(), "shop address");
         validateClosureTimeCoherence(shopDto.getOpensAt(), shopDto.getClosesAt(), ShopResKey.NMI_S_0001);
+
         if (!shopDto.isWithoutBreakClosure()) {
             notNull(shopDto.getBreakClosureStart(), "shop break closure start");
             notNull(shopDto.getBreakClosureEnd(), "shop break closure end");
             validateClosureTimeCoherence(shopDto.getBreakClosureStart(), shopDto.getBreakClosureEnd(), ShopResKey.NMI_S_0001);
         }
         validateAddress(shopDto.getAddress());
-        MiUser proUser = proUserRepo.findByUsername(CoreSecurity.getAttribute("username"));
 
         Shop shop = new Shop();
         shop.setName(shopDto.getName());
@@ -71,8 +82,8 @@ public class ShopServiceImpl implements IShopService {
             options.setBreakClosureStart(shopDto.getBreakClosureStart());
             options.setBreakClosureEnd(shopDto.getBreakClosureEnd());
         }
+        shop.setResponsible(proUser);
         options.setSchedulingAppointment(shopDto.isSchedulingAppointment());
-        shopOptionsRepository.save(options);
         shop.setOptions(options);
 
         // address
@@ -84,7 +95,6 @@ public class ShopServiceImpl implements IShopService {
         address.setLine2(shopDto.getAddress().getLine2());
         Point point = new Point(shopDto.getAddress().getLongitude(), shopDto.getAddress().getLatitude());
         address.setLocation(point);
-        addressRepository.save(address);
         shop.setAddress(address);
         shopRepository.save(shop);
     }
@@ -92,11 +102,6 @@ public class ShopServiceImpl implements IShopService {
     @Override
     public PaginatedSearchResult<Shop> search(SearchShopDto searchShopDto, Pageable pageable) {
         notNull(searchShopDto.getAddress(), "address");
-        if (CoreSecurity.isAuthenticated()) {
-            //TODO implement a search based on user + crtiera
-        } else {
-
-        }
         Collection<Address> addresses = addressRepository.findByLocation(searchShopDto.getAddress().getLongitude(), searchShopDto.getAddress().getLatitude());
         if (addresses != null && !addresses.isEmpty()) {
             return PaginatedSearchResult.of(shopRepository.findByAddressesIds(addresses, pageable));
@@ -104,7 +109,23 @@ public class ShopServiceImpl implements IShopService {
         return PaginatedSearchResult.of(null);
     }
 
+    @Override
+    public void updateImage(MultipartFile file, String shopId) {
+        notEmpty(file, "image");
+        MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
+        validateProUser(pro);
+        ShopValidator.validateShopBelongToUser(pro, shopId);
+        String image = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
+
+    }
+
     private void isValidRegistrationNumber(String registrationNumber) {
         // TODO implémenter la validation du siret
+    }
+
+    private void validateProUser(MiProUser proUser) {
+        if (proUser == null) { // TODO modifier la clé
+            throw new MiException(ShopResKey.NMI_S_0001);
+        }
     }
 }
