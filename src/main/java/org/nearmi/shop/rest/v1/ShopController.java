@@ -10,8 +10,10 @@ import org.nearmi.shop.service.IShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,5 +66,10 @@ public class ShopController {
     public ResponseEntity<Void> upload(@RequestPart("image") MultipartFile file, @PathVariable("shopId") String shopId) {
         shopService.updateImage(file, shopId);
         return ResponseEntity.status(HttpStatus.CREATED.value()).build();
+    }
+
+    @GetMapping(value = "/{shopId}/image", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public byte[] loadShopImage(@PathVariable("shopId") String shopId) {
+        return shopService.loadImage(shopId);
     }
 }

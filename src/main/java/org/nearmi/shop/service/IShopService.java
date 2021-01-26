@@ -34,4 +34,12 @@ public interface IShopService {
      * @param file
      */
     void updateImage(MultipartFile file, String shopId);
+
+    /**
+     * load presentation image of shop from its id if exist
+     *
+     * @param shopId
+     * @return
+     */
+    byte[] loadImage(String shopId);
 }

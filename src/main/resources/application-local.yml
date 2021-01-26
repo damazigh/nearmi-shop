@@ -1,7 +1,7 @@
 server:
   servlet.context-path: /api
   port: 8001
-#Max file upload 5mb
+# max upload file size
 spring:
   http:
     multipart:
@@ -9,6 +9,7 @@ spring:
 
 # Keycloak configuration
 keycloak:
+  # when using self signed certificate => use a special http vhost to avoid handling java pkix (untrusted root ca)
   auth-server-url: https://cluster.nearmi-dev/auth
   realm: nearmi-dev
   bearerOnly: true
@@ -16,6 +17,7 @@ keycloak:
   resource: nearmi-back
   cors: false
   confidential-port: 0
+
 # app configuration (mongo + override security)
 nearmi:
   config:
@@ -25,9 +27,9 @@ nearmi:
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
     max-distance: 10000.0
-    debugSecurity: false
+    #accepted mime type for images
     acceptedImageMime: 'image/jpeg, image/png'
-    dataPath: '/nearmi/data'
+    dataPath: 'C:\nearmi-data'
 logging:
   level:
     org:
@@ -36,3 +38,4 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+      nearmi: DEBUG

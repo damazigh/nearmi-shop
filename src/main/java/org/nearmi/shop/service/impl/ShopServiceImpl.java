@@ -1,5 +1,6 @@
 package org.nearmi.shop.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
 import org.nearmi.core.exception.MiException;
 import org.nearmi.core.mongo.document.MiProUser;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.nearmi.core.validator.Validator.*;
 import static org.nearmi.shop.validator.ShopValidator.validateClosureTimeCoherence;
@@ -114,9 +116,25 @@ public class ShopServiceImpl implements IShopService {
         notEmpty(file, "image");
         MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
         validateProUser(pro);
-        ShopValidator.validateShopBelongToUser(pro, shopId);
+        Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
+        if (StringUtils.isNotBlank(targetShop.getImageMetadata())) {
+            uploadService.deleteIfExist(targetShop.getImageMetadata());
+        }
         String image = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
+        targetShop.setImageMetadata(image);
+        shopRepository.save(targetShop);
+    }
 
+    @Override
+    public byte[] loadImage(String shopId) {
+        Optional<Shop> opShop = shopRepository.findById(shopId);
+        if (opShop.isPresent()) {
+            Shop shop = opShop.get();
+            if (shop.getImageMetadata() != null) {
+                return uploadService.load(shop.getImageMetadata());
+            }
+        }
+        return null;
     }
 
     private void isValidRegistrationNumber(String registrationNumber) {
