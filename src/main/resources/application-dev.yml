@@ -28,10 +28,8 @@ nearmi:
     override-security: true
     max-distance: 10000.0
     #accepted mime type for images
-    acceptedImageMime:
-      - 'image/jpeg'
-      - 'image/png'
-
+    acceptedImageMime: 'image/jpeg, image/png'
+    dataPath: '/nearmi/data'
 logging:
   level:
     org:

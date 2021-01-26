@@ -26,9 +26,8 @@ nearmi:
     override-security: true
     max-distance: 10000.0
     debugSecurity: true
-    acceptedImageMime:
-      - 'image/jpeg'
-      - 'image/png'
+    acceptedImageMime: 'image/jpeg, image/png'
+    dataPath: '/nearmi/data'
 logging:
   level:
     org:
