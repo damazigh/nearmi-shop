@@ -16,7 +16,7 @@ public class ShopSecurityConfig extends SecurityConfig {
         super.configure(http);
         http.csrf().disable().authorizeRequests()
                 .antMatchers(
-                        "/shop/v1/search",
+                        "/shop/v1/search*",
                         "/shop/v1/*/image"
                 )
                 .permitAll().anyRequest().authenticated();

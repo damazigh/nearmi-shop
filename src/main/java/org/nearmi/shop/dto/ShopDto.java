@@ -6,6 +6,7 @@ import org.nearmi.core.mongo.document.technical.Time;
 
 @Data
 public class ShopDto {
+    private String id;
     private String name;
     private String description;
     private String shortDescription;
