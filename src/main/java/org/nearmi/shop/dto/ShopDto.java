@@ -18,6 +18,7 @@ public class ShopDto {
     private boolean withoutBreakClosure;
     private boolean automaticOrderConfirmation;
     private boolean schedulingAppointment;
+    private boolean hasImage;
     private Time breakClosureStart;
     private Time breakClosureEnd;
 }
