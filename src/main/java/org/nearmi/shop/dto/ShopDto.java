@@ -21,4 +21,5 @@ public class ShopDto {
     private boolean hasImage;
     private Time breakClosureStart;
     private Time breakClosureEnd;
+    private double distance;
 }

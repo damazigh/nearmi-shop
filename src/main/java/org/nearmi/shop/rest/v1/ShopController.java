@@ -59,7 +59,7 @@ public class ShopController {
         PaginatedSearchResult<Shop> psr = shopService.search(searchShop,
                 PageRequest.of(parsePaginationParam(offset, 0), parsePaginationParam(limit, 1)));
         HttpUtils.addPaginationHeader(res, psr);
-        return ResponseEntity.status(psr.whichStatus()).body(shopMapper.mapAll(psr.getContent()));
+        return ResponseEntity.status(psr.whichStatus()).body(shopMapper.mapAll(psr.getContent(), searchShop.getAddress()));
     }
 
     @PutMapping("/upload/{shopId}")
