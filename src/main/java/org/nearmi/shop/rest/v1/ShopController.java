@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +38,7 @@ import static org.nearmi.core.util.HttpUtils.parsePaginationParam;
  */
 @RestController
 @RequestMapping("/shop/v1")
-@CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000"}, methods = {RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT})
 public class ShopController {
     @Autowired
     private IShopService shopService;
@@ -71,5 +72,10 @@ public class ShopController {
     @GetMapping(value = "/{shopId}/image", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] loadShopImage(@PathVariable("shopId") String shopId) {
         return shopService.loadImage(shopId);
+    }
+
+    @GetMapping("/mine")
+    public ResponseEntity<Collection<ShopDto>> userShops() {
+        return ResponseEntity.ok(shopMapper.mapAll(shopService.getBelongingShop(), null));
     }
 }

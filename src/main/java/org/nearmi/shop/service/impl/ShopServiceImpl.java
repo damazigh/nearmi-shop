@@ -9,6 +9,7 @@ import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.core.mongo.document.shopping.ShopOptions;
 import org.nearmi.core.repository.AddressRepository;
 import org.nearmi.core.repository.CoreUserRepository;
+import org.nearmi.core.resource.GeneralResKey;
 import org.nearmi.core.security.CoreSecurity;
 import org.nearmi.core.service.impl.UploadService;
 import org.nearmi.shop.dto.ShopDto;
@@ -135,6 +136,15 @@ public class ShopServiceImpl implements IShopService {
             }
         }
         return null;
+    }
+
+    @Override
+    public Collection<Shop> getBelongingShop() {
+        MiProUser proUser = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
+        if (proUser != null) {
+            return proUser.getShops();
+        }
+        throw new MiException(GeneralResKey.NMI_G_0001);
     }
 
     private void isValidRegistrationNumber(String registrationNumber) {

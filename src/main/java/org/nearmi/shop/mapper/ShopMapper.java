@@ -39,9 +39,11 @@ public interface ShopMapper {
 
     @AfterMapping
     default void distance(Shop shop, @MappingTarget ShopDto shopDto, @Context AddressDto address) {
-        shopDto.setDistance(GeoSpatialUtils.haversineDistance(
-                address.getLongitude(), address.getLatitude(),
-                shop.getAddress().getLocation().getX(), shop.getAddress().getLocation().getY()
-        ));
+        if (address != null) { // distance is not  needed when managing shops
+            shopDto.setDistance(GeoSpatialUtils.haversineDistance(
+                    address.getLongitude(), address.getLatitude(),
+                    shop.getAddress().getLocation().getX(), shop.getAddress().getLocation().getY()
+            ));
+        }
     }
 }

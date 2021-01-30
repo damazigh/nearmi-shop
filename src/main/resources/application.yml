@@ -25,7 +25,7 @@ nearmi:
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
     max-distance: 10000.0
-    debugSecurity: false
+    debugSecurity: true
     acceptedImageMime: 'image/jpeg, image/png'
     dataPath: '/nearmi/data'
 logging:

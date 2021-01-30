@@ -4,6 +4,8 @@ import lombok.Data;
 import org.nearmi.core.dto.AddressDto;
 import org.nearmi.core.mongo.document.technical.Time;
 
+import java.time.LocalDate;
+
 @Data
 public class ShopDto {
     private String id;
@@ -22,4 +24,5 @@ public class ShopDto {
     private Time breakClosureStart;
     private Time breakClosureEnd;
     private double distance;
+    private LocalDate created;
 }

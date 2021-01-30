@@ -14,11 +14,13 @@ public class ShopSecurityConfig extends SecurityConfig {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.csrf().disable().authorizeRequests()
+        http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(
                         "/shop/v1/search*",
                         "/shop/v1/*/image"
                 )
-                .permitAll().anyRequest().authenticated();
+                .permitAll()
+                .anyRequest()
+                .authenticated();
     }
 }

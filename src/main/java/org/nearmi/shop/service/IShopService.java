@@ -7,6 +7,8 @@ import org.nearmi.shop.dto.in.SearchShopDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collection;
+
 /**
  * contains business method for managing, creating, deleting a shop
  *
@@ -42,4 +44,12 @@ public interface IShopService {
      * @return
      */
     byte[] loadImage(String shopId);
+
+    /**
+     * retrieve belonging shop to authenticated user
+     *
+     * @return a collection of {@link Shop}
+     */
+    Collection<Shop> getBelongingShop();
+
 }
