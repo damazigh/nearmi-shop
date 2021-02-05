@@ -31,7 +31,7 @@ import java.util.Collection;
  */
 
 @RestController
-@RequestMapping("/shop/v1/pro")
+@RequestMapping("/v1/pro")
 @CrossOrigin(origins = {"http://localhost:3000"}, methods = {RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT})
 public class ProShopController {
     @Autowired

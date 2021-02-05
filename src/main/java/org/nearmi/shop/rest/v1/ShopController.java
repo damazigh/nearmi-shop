@@ -33,7 +33,7 @@ import static org.nearmi.core.util.HttpUtils.parsePaginationParam;
  * @since 0.1.0
  */
 @RestController
-@RequestMapping("/shop/v1")
+@RequestMapping("/v1")
 @CrossOrigin(origins = {"http://localhost:3000"}, methods = {RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT})
 public class ShopController {
     @Autowired

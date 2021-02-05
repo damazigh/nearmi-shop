@@ -16,14 +16,14 @@ public class ShopSecurityConfig extends SecurityConfig {
         super.configure(http);
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(
-                        "/shop/v1/search*",
-                        "/shop/v1/*/image",
+                        "/v1/search*",
+                        "/v1/*/image",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
                 )
                 .permitAll()
-                .antMatchers("/shop/v1/pro/**").hasRole("professional")
+                .antMatchers("/v1/pro/**").hasRole("professional")
                 .anyRequest()
                 .authenticated();
     }
