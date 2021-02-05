@@ -1,5 +1,5 @@
 server:
-  servlet.context-path: /api
+  servlet.context-path: /api/shop
   port: 8001
 # max upload file size
 spring:
