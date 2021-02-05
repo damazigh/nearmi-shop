@@ -28,11 +28,3 @@ nearmi:
     debugSecurity: true
     acceptedImageMime: 'image/jpeg, image/png'
     dataPath: '/nearmi/data'
-logging:
-  level:
-    org:
-      springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: DEBUG

@@ -22,7 +22,7 @@ import org.nearmi.shop.validator.ShopValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -96,7 +96,7 @@ public class ShopServiceImpl implements IShopService {
         address.setPostalCode(shopDto.getAddress().getPostalCode());
         address.setLine1(shopDto.getAddress().getLine1());
         address.setLine2(shopDto.getAddress().getLine2());
-        Point point = new Point(shopDto.getAddress().getLongitude(), shopDto.getAddress().getLatitude());
+        GeoJsonPoint point = new GeoJsonPoint(shopDto.getAddress().getLongitude(), shopDto.getAddress().getLatitude());
         address.setLocation(point);
         shop.setAddress(address);
         shopRepository.save(shop);

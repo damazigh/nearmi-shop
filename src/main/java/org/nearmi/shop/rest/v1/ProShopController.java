@@ -1,0 +1,57 @@
+package org.nearmi.shop.rest.v1;
+
+import org.nearmi.shop.dto.ShopDto;
+import org.nearmi.shop.mapper.ShopMapper;
+import org.nearmi.shop.service.IShopService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Collection;
+
+/**
+ * expose shop webservice for managing shop
+ * all webservice exposed with this class needs <b>Professional profile</b>
+ *
+ * @author A.djebarri
+ * @since 0.1.0
+ */
+
+@RestController
+@RequestMapping("/shop/v1/pro")
+@CrossOrigin(origins = {"http://localhost:3000"}, methods = {RequestMethod.GET, RequestMethod.OPTIONS, RequestMethod.POST, RequestMethod.PUT})
+public class ProShopController {
+    @Autowired
+    private IShopService shopService;
+    @Autowired
+    private ShopMapper shopMapper;
+
+
+    @GetMapping("/mine")
+    public ResponseEntity<Collection<ShopDto>> userShops() {
+        return ResponseEntity.ok(shopMapper.mapAll(shopService.getBelongingShop(), null));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Void> create(@RequestBody ShopDto shop) {
+        shopService.create(shop);
+        return ResponseEntity.status(HttpStatus.CREATED.value()).build();
+    }
+
+    @PutMapping("/upload/{shopId}")
+    public ResponseEntity<Void> upload(@RequestPart("image") MultipartFile file, @PathVariable("shopId") String shopId) {
+        shopService.updateImage(file, shopId);
+        return ResponseEntity.status(HttpStatus.CREATED.value()).build();
+    }
+}

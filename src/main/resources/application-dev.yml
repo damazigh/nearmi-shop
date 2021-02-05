@@ -31,12 +31,3 @@ nearmi:
     #accepted mime type for images
     acceptedImageMime: 'image/jpeg, image/png'
     dataPath: '/nearmi/data'
-logging:
-  level:
-    org:
-      springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: DEBUG
-      nearmi: DEBUG

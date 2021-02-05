@@ -20,6 +20,7 @@ public class ShopSecurityConfig extends SecurityConfig {
                         "/shop/v1/*/image"
                 )
                 .permitAll()
+                .antMatchers("/shop/v1/pro/**").hasRole("professional")
                 .anyRequest()
                 .authenticated();
     }
