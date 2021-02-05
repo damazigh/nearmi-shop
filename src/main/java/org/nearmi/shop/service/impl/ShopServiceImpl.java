@@ -116,7 +116,6 @@ public class ShopServiceImpl implements IShopService {
     public void updateImage(MultipartFile file, String shopId) {
         notEmpty(file, "image");
         MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
-        validateProUser(pro);
         Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
         if (StringUtils.isNotBlank(targetShop.getImageMetadata())) {
             uploadService.deleteIfExist(targetShop.getImageMetadata());
@@ -147,13 +146,14 @@ public class ShopServiceImpl implements IShopService {
         throw new MiException(GeneralResKey.NMI_G_0001);
     }
 
+    @Override
+    public Shop getDetail(String shopId) {
+        MiProUser proUser = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
+        return ShopValidator.validateShopBelongToUser(proUser, shopId);
+    }
+
     private void isValidRegistrationNumber(String registrationNumber) {
         // TODO implémenter la validation du siret
     }
 
-    private void validateProUser(MiProUser proUser) {
-        if (proUser == null) { // TODO modifier la clé
-            throw new MiException(ShopResKey.NMI_S_0001);
-        }
-    }
 }

@@ -15,7 +15,7 @@ import org.nearmi.shop.dto.ShopDto;
 
 import java.util.Collection;
 
-@Mapper(componentModel = "spring", uses = {AddressMapper.class})
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, ProductCategoryMapper.class})
 public interface ShopMapper {
 
     @Mappings({
@@ -27,6 +27,7 @@ public interface ShopMapper {
             @Mapping(source = "options.openWithoutClosure", target = "withoutBreakClosure"),
             @Mapping(source = "options.schedulingAppointment", target = "schedulingAppointment"),
             @Mapping(source = "imageMetadata", target = "hasImage", qualifiedByName = "hasImageQualifier"),
+            @Mapping(source = "shortDesc", target = "shortDescription")
     })
     ShopDto map(Shop shop, @Context AddressDto address);
 

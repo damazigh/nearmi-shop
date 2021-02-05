@@ -5,6 +5,7 @@ import org.nearmi.core.dto.AddressDto;
 import org.nearmi.core.mongo.document.technical.Time;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class ShopDto {
@@ -25,4 +26,5 @@ public class ShopDto {
     private Time breakClosureEnd;
     private double distance;
     private LocalDate created;
+    private List<ProductCategoryDto> productCategories;
 }

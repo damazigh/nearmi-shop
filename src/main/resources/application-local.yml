@@ -6,7 +6,10 @@ spring:
   http:
     multipart:
       max-file-size: 5MB
-
+# swagger ui
+springdoc:
+  api-docs:
+    enabled: true
 # Keycloak configuration
 keycloak:
   # when using self signed certificate => use a special http vhost to avoid handling java pkix (untrusted root ca)

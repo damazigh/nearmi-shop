@@ -41,7 +41,6 @@ public class ShopController {
     @Autowired
     private ShopMapper shopMapper;
 
-
     @PostMapping("/search")
     public ResponseEntity<Collection<ShopDto>> search(@RequestParam(required = false) String limit,
                                                       @RequestParam(required = false) String offset,

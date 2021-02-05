@@ -24,11 +24,9 @@ public class ProProductController {
     @Autowired
     private IProProductService proProductService;
 
-    @PostMapping
-    @RequestMapping(value = "/create", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public void createProduct(@PathVariable("shopId") String shopId,
                               @RequestPart MultipartFile files[], @RequestPart("data") CreateProductDto data) {
-
     }
 
     @PostMapping("/category/create")

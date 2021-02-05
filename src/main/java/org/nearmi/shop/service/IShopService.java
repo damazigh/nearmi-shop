@@ -52,4 +52,13 @@ public interface IShopService {
      */
     Collection<Shop> getBelongingShop();
 
+    /**
+     * get shop by its id
+     *
+     * @param shopId targeted shop id
+     * @return shop if found and belong to authenticated user
+     */
+    Shop getDetail(String shopId);
+
+
 }

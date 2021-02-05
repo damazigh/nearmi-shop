@@ -17,7 +17,10 @@ public class ShopSecurityConfig extends SecurityConfig {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(
                         "/shop/v1/search*",
-                        "/shop/v1/*/image"
+                        "/shop/v1/*/image",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
                 )
                 .permitAll()
                 .antMatchers("/shop/v1/pro/**").hasRole("professional")

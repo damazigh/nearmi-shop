@@ -1,7 +1,9 @@
 package org.nearmi.shop.rest.v1;
 
 import org.nearmi.shop.dto.ShopDto;
+import org.nearmi.shop.dto.ShopSummaryDto;
 import org.nearmi.shop.mapper.ShopMapper;
+import org.nearmi.shop.mapper.ShopSummaryMapper;
 import org.nearmi.shop.service.IShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,20 +37,32 @@ public class ProShopController {
     @Autowired
     private IShopService shopService;
     @Autowired
+    private ShopSummaryMapper shopSummaryMapper;
+    @Autowired
     private ShopMapper shopMapper;
 
-
-    @GetMapping("/mine")
-    public ResponseEntity<Collection<ShopDto>> userShops() {
-        return ResponseEntity.ok(shopMapper.mapAll(shopService.getBelongingShop(), null));
-    }
-
+    /*
+    shop resources
+     */
     @PostMapping("/create")
     public ResponseEntity<Void> create(@RequestBody ShopDto shop) {
         shopService.create(shop);
         return ResponseEntity.status(HttpStatus.CREATED.value()).build();
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<Collection<ShopSummaryDto>> userShops() {
+        return ResponseEntity.ok(shopSummaryMapper.mapAll(shopService.getBelongingShop()));
+    }
+
+    @GetMapping("/{shopId}")
+    public ResponseEntity<ShopDto> shopDetail(@PathVariable("shopId") String shopId) {
+        return ResponseEntity.ok(shopMapper.map(shopService.getDetail(shopId), null));
+    }
+
+    /*
+      Shop upload resource
+     */
     @PutMapping("/upload/{shopId}")
     public ResponseEntity<Void> upload(@RequestPart("image") MultipartFile file, @PathVariable("shopId") String shopId) {
         shopService.updateImage(file, shopId);
