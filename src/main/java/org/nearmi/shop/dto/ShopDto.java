@@ -27,4 +27,5 @@ public class ShopDto {
     private double distance;
     private LocalDate created;
     private List<ProductCategoryDto> productCategories;
+    private List<String> metadata;
 }

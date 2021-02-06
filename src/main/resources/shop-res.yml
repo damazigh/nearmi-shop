@@ -2,3 +2,7 @@
   message: 'Incoherent value detected'
   description: "Opening time '%s' cannot be previous closure '%s'"
   status: 400
+- key: 'NMI_S_0002'
+  message: 'Max image to upload exceeded'
+  description: 'You cannot upload more than %1s image (actual: %2s)'
+  status: 400

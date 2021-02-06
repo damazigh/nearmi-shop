@@ -33,3 +33,4 @@ nearmi:
     #accepted mime type for images
     acceptedImageMime: 'image/jpeg, image/png'
     dataPath: 'C:\nearmi-data'
+    max-image-for-shop: 6

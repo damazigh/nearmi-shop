@@ -33,9 +33,9 @@ public interface IShopService {
     /**
      * update shop image
      *
-     * @param file
+     * @param files
      */
-    void updateImage(MultipartFile file, String shopId);
+    void updateImages(MultipartFile[] files, String shopId);
 
     /**
      * load presentation image of shop from its id if exist
@@ -43,7 +43,7 @@ public interface IShopService {
      * @param shopId
      * @return
      */
-    byte[] loadImage(String shopId);
+    byte[] loadImage(String shopId, String name);
 
     /**
      * retrieve belonging shop to authenticated user

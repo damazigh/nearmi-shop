@@ -19,6 +19,6 @@ public class ShopValidator {
         Validator.notNull(proUser, "user");
         return proUser.getShops().stream()
                 .filter(s -> s.getId().equalsIgnoreCase(shopId))
-                .findFirst().orElseThrow(() -> new UnauthorizedException(String.format("Unauthorized ! not allowed to update shop with id %1s", shopId)));
+                .findFirst().orElseThrow(() -> new UnauthorizedException(String.format("Unauthorized ! not allowed to interact with shop %1s", shopId)));
     }
 }

@@ -1,5 +1,6 @@
 package org.nearmi.shop.mapper;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
@@ -14,6 +15,9 @@ import org.nearmi.core.util.GeoSpatialUtils;
 import org.nearmi.shop.dto.ShopDto;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {AddressMapper.class, ProductCategoryMapper.class})
 public interface ShopMapper {
@@ -27,7 +31,8 @@ public interface ShopMapper {
             @Mapping(source = "options.openWithoutClosure", target = "withoutBreakClosure"),
             @Mapping(source = "options.schedulingAppointment", target = "schedulingAppointment"),
             @Mapping(source = "imageMetadata", target = "hasImage", qualifiedByName = "hasImageQualifier"),
-            @Mapping(source = "shortDesc", target = "shortDescription")
+            @Mapping(source = "shortDesc", target = "shortDescription"),
+            @Mapping(source = "metadata", target = "metadata", qualifiedByName = "metadataQualifier")
     })
     ShopDto map(Shop shop, @Context AddressDto address);
 
@@ -36,6 +41,14 @@ public interface ShopMapper {
     @Named("hasImageQualifier")
     default boolean hasImageQualifier(String metadata) {
         return StringUtils.isNotBlank(metadata);
+    }
+
+    @Named("metadataQualifier")
+    default List<String> metadataQualifier(List<String> metadata) {
+        if (metadata != null && !metadata.isEmpty()) {
+            return metadata.stream().map(FilenameUtils::getName).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     @AfterMapping

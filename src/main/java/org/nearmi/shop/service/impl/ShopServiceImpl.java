@@ -1,5 +1,6 @@
 package org.nearmi.shop.service.impl;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
 import org.nearmi.core.exception.MiException;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.nearmi.core.validator.Validator.*;
@@ -113,28 +115,34 @@ public class ShopServiceImpl implements IShopService {
     }
 
     @Override
-    public void updateImage(MultipartFile file, String shopId) {
-        notEmpty(file, "image");
+    public void updateImages(MultipartFile[] files, String shopId) {
         MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
         Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
-        if (StringUtils.isNotBlank(targetShop.getImageMetadata())) {
-            uploadService.deleteIfExist(targetShop.getImageMetadata());
+        int actualSize = targetShop.getMetadata().size();
+        int afterUploadSize = actualSize + files.length;
+        int maxAuthorizedFile = env.getRequiredProperty("nearmi.config.max-image-for-shop", Integer.class);
+        if (afterUploadSize > maxAuthorizedFile) {
+            throw new MiException(ShopResKey.NMI_S_0002, String.valueOf(maxAuthorizedFile), String.valueOf(afterUploadSize));
         }
-        String image = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
-        targetShop.setImageMetadata(image);
+        for (MultipartFile file : files) {
+            notEmpty(file, "image");
+            String image = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
+            targetShop.getMetadata().add(image);
+        }
         shopRepository.save(targetShop);
     }
 
     @Override
-    public byte[] loadImage(String shopId) {
+    public byte[] loadImage(String shopId, String name) {
         Optional<Shop> opShop = shopRepository.findById(shopId);
         if (opShop.isPresent()) {
             Shop shop = opShop.get();
-            if (shop.getImageMetadata() != null) {
-                return uploadService.load(shop.getImageMetadata());
+            String imageMetadata = findImageMetadataByName(shop.getMetadata(), name);
+            if (imageMetadata != null) {
+                return uploadService.load(imageMetadata);
             }
         }
-        return null;
+        throw new MiException(GeneralResKey.NMI_G_0010); // 404 not found
     }
 
     @Override
@@ -154,6 +162,13 @@ public class ShopServiceImpl implements IShopService {
 
     private void isValidRegistrationNumber(String registrationNumber) {
         // TODO implémenter la validation du siret
+    }
+
+    private String findImageMetadataByName(List<String> metadata, String name) {
+        if (metadata != null && !metadata.isEmpty()) {
+            return metadata.stream().filter(m -> StringUtils.equals(FilenameUtils.getName(m), name)).findFirst().orElse(null);
+        }
+        return null;
     }
 
 }

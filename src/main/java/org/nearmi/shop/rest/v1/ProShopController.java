@@ -64,8 +64,8 @@ public class ProShopController {
       Shop upload resource
      */
     @PutMapping("/upload/{shopId}")
-    public ResponseEntity<Void> upload(@RequestPart("image") MultipartFile file, @PathVariable("shopId") String shopId) {
-        shopService.updateImage(file, shopId);
+    public ResponseEntity<Void> upload(@RequestPart("images") MultipartFile[] files, @PathVariable("shopId") String shopId) {
+        shopService.updateImages(files, shopId);
         return ResponseEntity.status(HttpStatus.CREATED.value()).build();
     }
 }

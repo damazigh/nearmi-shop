@@ -52,9 +52,9 @@ public class ShopController {
         return ResponseEntity.status(psr.whichStatus()).body(shopMapper.mapAll(psr.getContent(), searchShop.getAddress()));
     }
 
-    @GetMapping(value = "/{shopId}/image", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public byte[] loadShopImage(@PathVariable("shopId") String shopId) {
-        return shopService.loadImage(shopId);
+    @GetMapping(value = "/{shopId}/image/{name}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public byte[] loadShopImage(@PathVariable("shopId") String shopId, @PathVariable("name") String name) {
+        return shopService.loadImage(shopId, name);
     }
 
 

@@ -17,7 +17,7 @@ public class ShopSecurityConfig extends SecurityConfig {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(
                         "/v1/search*",
-                        "/v1/*/image",
+                        "/v1/*/image/*",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
