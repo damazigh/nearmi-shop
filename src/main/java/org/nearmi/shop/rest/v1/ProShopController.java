@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,8 +65,14 @@ public class ProShopController {
       Shop upload resource
      */
     @PutMapping("/upload/{shopId}")
-    public ResponseEntity<Void> upload(@RequestPart("images") MultipartFile[] files, @PathVariable("shopId") String shopId) {
-        shopService.updateImages(files, shopId);
+    public ResponseEntity<Void> upload(@RequestPart("images") MultipartFile[] files, @PathVariable("shopId") String shopId, @RequestParam(value = "root", required = false) String root) {
+        shopService.updateImages(files, shopId, root);
         return ResponseEntity.status(HttpStatus.CREATED.value()).build();
+    }
+
+    @PutMapping("/delete/{shopId}")
+    public ResponseEntity<Void> delete(@RequestParam("images") String[] images, @PathVariable("shopId") String shopId) {
+        shopService.delete(images, shopId);
+        return ResponseEntity.noContent().build();
     }
 }

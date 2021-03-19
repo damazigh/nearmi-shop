@@ -1,7 +1,5 @@
 package org.nearmi.shop.mapper;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -11,6 +9,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.nearmi.core.dto.AddressDto;
 import org.nearmi.core.mongo.document.shopping.Shop;
+import org.nearmi.core.mongo.document.technical.ImageMetadata;
 import org.nearmi.core.util.GeoSpatialUtils;
 import org.nearmi.shop.dto.ShopDto;
 
@@ -19,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {AddressMapper.class, ProductCategoryMapper.class})
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, ProductCategoryMapper.class, ImageMetadataMapper.class})
 public interface ShopMapper {
 
     @Mappings({
@@ -30,23 +29,16 @@ public interface ShopMapper {
             @Mapping(source = "options.breakClosureEnd", target = "breakClosureEnd"),
             @Mapping(source = "options.openWithoutClosure", target = "withoutBreakClosure"),
             @Mapping(source = "options.schedulingAppointment", target = "schedulingAppointment"),
-            @Mapping(source = "imageMetadata", target = "hasImage", qualifiedByName = "hasImageQualifier"),
             @Mapping(source = "shortDesc", target = "shortDescription"),
-            @Mapping(source = "metadata", target = "metadata", qualifiedByName = "metadataQualifier")
     })
     ShopDto map(Shop shop, @Context AddressDto address);
 
     Collection<ShopDto> mapAll(Collection<Shop> shops, @Context AddressDto address);
 
-    @Named("hasImageQualifier")
-    default boolean hasImageQualifier(String metadata) {
-        return StringUtils.isNotBlank(metadata);
-    }
-
     @Named("metadataQualifier")
-    default List<String> metadataQualifier(List<String> metadata) {
+    default List<String> metadataQualifier(List<ImageMetadata> metadata) {
         if (metadata != null && !metadata.isEmpty()) {
-            return metadata.stream().map(FilenameUtils::getName).collect(Collectors.toList());
+            return metadata.stream().map(ImageMetadata::getName).collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

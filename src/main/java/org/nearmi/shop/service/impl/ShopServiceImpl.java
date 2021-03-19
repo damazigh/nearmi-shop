@@ -1,5 +1,6 @@
 package org.nearmi.shop.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
@@ -8,6 +9,7 @@ import org.nearmi.core.mongo.document.MiProUser;
 import org.nearmi.core.mongo.document.shopping.Address;
 import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.core.mongo.document.shopping.ShopOptions;
+import org.nearmi.core.mongo.document.technical.ImageMetadata;
 import org.nearmi.core.repository.AddressRepository;
 import org.nearmi.core.repository.CoreUserRepository;
 import org.nearmi.core.resource.GeneralResKey;
@@ -27,6 +29,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +37,7 @@ import java.util.Optional;
 import static org.nearmi.core.validator.Validator.*;
 import static org.nearmi.shop.validator.ShopValidator.validateClosureTimeCoherence;
 
+@Slf4j
 @Service
 public class ShopServiceImpl implements IShopService {
     @Autowired
@@ -101,6 +105,7 @@ public class ShopServiceImpl implements IShopService {
         GeoJsonPoint point = new GeoJsonPoint(shopDto.getAddress().getLongitude(), shopDto.getAddress().getLatitude());
         address.setLocation(point);
         shop.setAddress(address);
+        addressRepository.ensureGeo2dIndex();
         shopRepository.save(shop);
     }
 
@@ -115,19 +120,33 @@ public class ShopServiceImpl implements IShopService {
     }
 
     @Override
-    public void updateImages(MultipartFile[] files, String shopId) {
+    public void updateImages(MultipartFile[] files, String shopId, String rootImage) {
         MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
         Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
         int actualSize = targetShop.getMetadata().size();
+        log.debug("Already saved {} image for shop with id : {}", actualSize, shopId);
         int afterUploadSize = actualSize + files.length;
         int maxAuthorizedFile = env.getRequiredProperty("nearmi.config.max-image-for-shop", Integer.class);
+
         if (afterUploadSize > maxAuthorizedFile) {
+            log.error("image limit exceeded ({}), trying to save {} images", maxAuthorizedFile, afterUploadSize);
             throw new MiException(ShopResKey.NMI_S_0002, String.valueOf(maxAuthorizedFile), String.valueOf(afterUploadSize));
         }
         for (MultipartFile file : files) {
             notEmpty(file, "image");
-            String image = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
-            targetShop.getMetadata().add(image);
+            log.debug("saving image  {} for shop {}", file.getOriginalFilename(), shopId);
+            String path = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
+            log.debug("image {} saved at {}", file.getOriginalFilename(), path);
+            ImageMetadata metadata = new ImageMetadata(pro.getId(), isRootImage(rootImage, path), path);
+            targetShop.getMetadata().add(metadata);
+            log.debug("target shop {} metadata updated", targetShop.getId());
+        }
+        // user didn't chose root image, set first image as root
+        if (!targetShop.getMetadata().isEmpty() && targetShop.getMetadata().stream().noneMatch(ImageMetadata::isRootImage)) {
+            ImageMetadata metadata = targetShop.getMetadata().get(0);
+            metadata.setRootImage(true);
+            log.warn("user didn't provide a root image. Image saved at path {} marked as root", metadata.getPath());
+
         }
         shopRepository.save(targetShop);
     }
@@ -137,9 +156,9 @@ public class ShopServiceImpl implements IShopService {
         Optional<Shop> opShop = shopRepository.findById(shopId);
         if (opShop.isPresent()) {
             Shop shop = opShop.get();
-            String imageMetadata = findImageMetadataByName(shop.getMetadata(), name);
+            ImageMetadata imageMetadata = findImageMetadataByName(shop.getMetadata(), name);
             if (imageMetadata != null) {
-                return uploadService.load(imageMetadata);
+                return uploadService.load(imageMetadata.getPath());
             }
         }
         throw new MiException(GeneralResKey.NMI_G_0010); // 404 not found
@@ -160,15 +179,30 @@ public class ShopServiceImpl implements IShopService {
         return ShopValidator.validateShopBelongToUser(proUser, shopId);
     }
 
+    @Override
+    public void delete(String[] images, String shopId) {
+        MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
+        Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
+        targetShop.getMetadata().forEach(m -> {
+            if (Arrays.stream(images).anyMatch(img -> StringUtils.equals(m.getName(), img))) {
+                uploadService.deleteIfExist(m.getPath());
+            }
+        });
+    }
+
     private void isValidRegistrationNumber(String registrationNumber) {
         // TODO implémenter la validation du siret
     }
 
-    private String findImageMetadataByName(List<String> metadata, String name) {
+    private ImageMetadata findImageMetadataByName(List<ImageMetadata> metadata, String name) {
         if (metadata != null && !metadata.isEmpty()) {
-            return metadata.stream().filter(m -> StringUtils.equals(FilenameUtils.getName(m), name)).findFirst().orElse(null);
+            return metadata.stream().filter(m -> StringUtils.equals(FilenameUtils.getName(m.getPath()), name)).findFirst().orElse(null);
         }
         return null;
+    }
+
+    private boolean isRootImage(String rootImage, String path) {
+        return StringUtils.equals(FilenameUtils.getName(path), rootImage);
     }
 
 }

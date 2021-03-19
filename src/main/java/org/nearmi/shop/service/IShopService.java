@@ -35,7 +35,7 @@ public interface IShopService {
      *
      * @param files
      */
-    void updateImages(MultipartFile[] files, String shopId);
+    void updateImages(MultipartFile[] files, String shopId, String rootImage);
 
     /**
      * load presentation image of shop from its id if exist
@@ -60,5 +60,11 @@ public interface IShopService {
      */
     Shop getDetail(String shopId);
 
-
+    /**
+     * method that allows deletion of shop images
+     *
+     * @param images a list of images name that user wishes to delete
+     * @param shopId shop internal id
+     */
+    void delete(String[] images, String shopId);
 }
