@@ -29,6 +29,7 @@ nearmi:
     dbPassword: 'dev@password'
     cluster: 'cluster0.kvkgz.mongodb.net'
     override-security: true
+    debugSecurity: true
     max-distance: 10000.0
     #accepted mime type for images
     acceptedImageMime: 'image/jpeg, image/png'

@@ -7,6 +7,6 @@ USER root
 COPY rootCA.crt $JAVA_HOME/lib/security
 RUN \
     cd $JAVA_HOME/lib/security \
-    && keytool -keystore cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias nearmiRootCA -file rootCA.crt
+    && keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias nearmiRootCA -file rootCA.crt
 EXPOSE 8001
 ENTRYPOINT ["java","-jar","/shop.jar"]
