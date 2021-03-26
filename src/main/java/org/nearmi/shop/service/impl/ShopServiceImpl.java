@@ -29,6 +29,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -181,13 +182,27 @@ public class ShopServiceImpl implements IShopService {
 
     @Override
     public void delete(String[] images, String shopId) {
+        log.info("requesting deletion images {} - for shop {}", images, shopId);
         MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
         Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
+        List<String> metaNameToRemove = new ArrayList<>();
         targetShop.getMetadata().forEach(m -> {
             if (Arrays.stream(images).anyMatch(img -> StringUtils.equals(m.getName(), img))) {
+                log.debug("trying to delete metadata with name {}", m.getName());
                 uploadService.deleteIfExist(m.getPath());
+                log.debug("image at path {} deleted (if it exists)", m.getPath());
+                metaNameToRemove.add(m.getName());
+                log.debug("added {} to tracked list of metadata to remove from shop with id {}", m.getName(), shopId);
             }
         });
+        boolean res = targetShop.getMetadata().removeIf(
+                m -> metaNameToRemove.stream()
+                        .anyMatch(name -> StringUtils.equals(m.getName(), name)));
+        if (res) {
+            shopRepository.save(targetShop);
+            log.debug("target shop with id {} updated", shopId);
+        }
+
     }
 
     private void isValidRegistrationNumber(String registrationNumber) {
