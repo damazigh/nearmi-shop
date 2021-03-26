@@ -52,7 +52,7 @@ deploy:
   dependencies:
     - package
   before_script:
-    - cp /conf/rootCA.crt /kaniko/ssl/certs/
+    - cp /conf/nearmiRootCA.crt /kaniko/ssl/certs/
   script:
     - |
       TAG=$(cat version.info);
