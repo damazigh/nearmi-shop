@@ -35,3 +35,4 @@ nearmi:
     acceptedImageMime: 'image/jpeg, image/png'
     dataPath: 'C:\nearmi-data'
     max-image-for-shop: 15
+    enable-dev-cors: true

@@ -205,6 +205,27 @@ public class ShopServiceImpl implements IShopService {
 
     }
 
+    @Override
+    public void markAsRoot(String shopId, String name) {
+        notEmpty(name, "image name");
+        MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
+        Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
+        Optional<ImageMetadata> optional = targetShop.getMetadata().stream().filter(m -> m.getName().equals(name))
+                .findFirst();
+        if (optional.isEmpty()) {
+            throw new MiException(ShopResKey.NMI_S_0002);
+        }
+        Optional<ImageMetadata> oldOp = targetShop.getMetadata().stream().filter(ImageMetadata::isRootImage).findFirst();
+        ImageMetadata old = null;
+        if (oldOp.isPresent()) {
+            old = oldOp.get();
+            old.setRootImage(false);
+        }
+        ImageMetadata toUpdate = optional.get();
+        toUpdate.setRootImage(true);
+        shopRepository.save(targetShop);
+    }
+
     private void isValidRegistrationNumber(String registrationNumber) {
         // TODO implémenter la validation du siret
     }

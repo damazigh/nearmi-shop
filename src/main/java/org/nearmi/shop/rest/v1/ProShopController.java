@@ -75,4 +75,10 @@ public class ProShopController {
         shopService.delete(images, shopId);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{shopId}/image/mark-root/{name}")
+    public ResponseEntity<Void> markAsRoot(@PathVariable("shopId") String shopId, @PathVariable("name") String name) {
+        shopService.markAsRoot(shopId, name);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

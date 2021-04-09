@@ -67,4 +67,6 @@ public interface IShopService {
      * @param shopId shop internal id
      */
     void delete(String[] images, String shopId);
+
+    void markAsRoot(String shopId, String name);
 }
