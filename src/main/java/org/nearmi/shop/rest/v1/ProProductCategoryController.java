@@ -25,13 +25,13 @@ public class ProProductCategoryController {
     @Autowired
     private ProductCategoryMapper productCategoryMapper;
 
-    @PostMapping(value = "", produces = "application/json", consumes = "application/json")
+    @PostMapping(produces = "application/json", consumes = "application/json")
     public ResponseEntity<Void> createProductCategory(@PathVariable("shopId") String shopId, @RequestBody Collection<CreateProductCategoryDto> productCategoryDto) {
         proProductCategoryService.createProductCategories(shopId, productCategoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping(value = "", produces = "application/json", consumes = "application/json")
+    @GetMapping(produces = "application/json")
     public ResponseEntity<Collection<ProductCategoryDto>> listProductCategory(@PathVariable("shopId") String shopId) {
         return ResponseEntity.ok(productCategoryMapper.mapAll(proProductCategoryService.listProductCategory(shopId)));
     }

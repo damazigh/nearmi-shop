@@ -20,6 +20,7 @@ public class ProProductController {
     @PostMapping(consumes = {"multipart/form-data"})
     public void createProduct(@PathVariable("shopId") String shopId,
                               @RequestPart MultipartFile files[], @RequestPart("data") CreateProductDto data) {
+        proProductService.createProduct(shopId, data, files);
     }
 
 

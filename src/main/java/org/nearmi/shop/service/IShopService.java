@@ -3,11 +3,13 @@ package org.nearmi.shop.service;
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
 import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.shop.dto.ShopDto;
+import org.nearmi.shop.dto.in.ImageBoundariesDto;
 import org.nearmi.shop.dto.in.SearchShopDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * contains business method for managing, creating, deleting a shop
@@ -31,11 +33,12 @@ public interface IShopService {
     PaginatedSearchResult<Shop> search(SearchShopDto searchShopDto, Pageable pageable);
 
     /**
-     * update shop image
-     *
      * @param files
+     * @param shopId
+     * @param rootImage
+     * @param bound$
      */
-    void updateImages(MultipartFile[] files, String shopId, String rootImage);
+    void updateImages(MultipartFile[] files, String shopId, String rootImage, List<ImageBoundariesDto> bound$);
 
     /**
      * load presentation image of shop from its id if exist

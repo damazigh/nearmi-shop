@@ -16,6 +16,7 @@ import org.nearmi.core.resource.GeneralResKey;
 import org.nearmi.core.security.CoreSecurity;
 import org.nearmi.core.service.impl.UploadService;
 import org.nearmi.shop.dto.ShopDto;
+import org.nearmi.shop.dto.in.ImageBoundariesDto;
 import org.nearmi.shop.dto.in.SearchShopDto;
 import org.nearmi.shop.repository.ShopOptionsRepository;
 import org.nearmi.shop.repository.ShopRepository;
@@ -121,7 +122,13 @@ public class ShopServiceImpl implements IShopService {
     }
 
     @Override
-    public void updateImages(MultipartFile[] files, String shopId, String rootImage) {
+    public void updateImages(MultipartFile[] files, String shopId, String rootImage, List<ImageBoundariesDto> boundaries) {
+        // prerequisites validation
+        notEmpty(files, "uploaded files");
+        notEmpty(boundaries, "image boundaries");
+        equal(files.length, boundaries.size(), "NMI_S_0004");
+
+        // business validation
         MiProUser pro = proUserRepo.findByUsername(CoreSecurity.token().getPreferredUsername());
         Shop targetShop = ShopValidator.validateShopBelongToUser(pro, shopId);
         int actualSize = targetShop.getMetadata().size();
@@ -133,14 +140,19 @@ public class ShopServiceImpl implements IShopService {
             log.error("image limit exceeded ({}), trying to save {} images", maxAuthorizedFile, afterUploadSize);
             throw new MiException(ShopResKey.NMI_S_0002, String.valueOf(maxAuthorizedFile), String.valueOf(afterUploadSize));
         }
+        int i = 0;
         for (MultipartFile file : files) {
             notEmpty(file, "image");
+            ImageBoundariesDto imgBoundaries = boundaries.get(i);
+            notEmpty(imgBoundaries, "image boundaries");
             log.debug("saving image  {} for shop {}", file.getOriginalFilename(), shopId);
             String path = uploadService.upload(file, pro.getId(), shopId, env.getRequiredProperty("nearmi.config.acceptedImageMime", String[].class));
             log.debug("image {} saved at {}", file.getOriginalFilename(), path);
-            ImageMetadata metadata = new ImageMetadata(pro.getId(), isRootImage(rootImage, path), path);
+            ImageMetadata metadata = new ImageMetadata(pro.getId(), isRootImage(rootImage, path), path, imgBoundaries.getWidth(), imgBoundaries.getHeight());
+            log.debug("created metadata referencing image at path {} with boundaries [h: {}, w: {}]", path, imgBoundaries.getHeight(), imgBoundaries.getWidth());
             targetShop.getMetadata().add(metadata);
             log.debug("target shop {} metadata updated", targetShop.getId());
+            i++;
         }
         // user didn't chose root image, set first image as root
         if (!targetShop.getMetadata().isEmpty() && targetShop.getMetadata().stream().noneMatch(ImageMetadata::isRootImage)) {

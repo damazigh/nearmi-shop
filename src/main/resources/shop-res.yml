@@ -10,3 +10,7 @@
   message: 'Deletion failed'
   description: 'Product category with id %1s not found'
   status: 404
+- key: 'NMI_S_0004'
+  message: 'Upload failed'
+  description: "Image boundaries list length doesn't fit file list length"
+  status: 400

@@ -2,11 +2,13 @@ package org.nearmi.shop.rest.v1;
 
 import org.nearmi.shop.dto.ShopDto;
 import org.nearmi.shop.dto.ShopSummaryDto;
+import org.nearmi.shop.dto.in.ImageBoundariesDto;
 import org.nearmi.shop.mapper.ShopMapper;
 import org.nearmi.shop.mapper.ShopSummaryMapper;
 import org.nearmi.shop.service.IShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * expose shop webservice for managing shop
@@ -64,9 +67,13 @@ public class ProShopController {
     /*
       Shop upload resource
      */
-    @PutMapping("/upload/{shopId}")
-    public ResponseEntity<Void> upload(@RequestPart("images") MultipartFile[] files, @PathVariable("shopId") String shopId, @RequestParam(value = "root", required = false) String root) {
-        shopService.updateImages(files, shopId, root);
+    @PutMapping(value = "/upload/{shopId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> upload(@RequestPart("images") MultipartFile[] files, @PathVariable("shopId") String shopId,
+                                       @RequestPart("boundaries") List<ImageBoundariesDto> boundaries,
+                                       @RequestParam(value = "root", required = false) String root
+
+    ) {
+        shopService.updateImages(files, shopId, root, boundaries);
         return ResponseEntity.status(HttpStatus.CREATED.value()).build();
     }
 

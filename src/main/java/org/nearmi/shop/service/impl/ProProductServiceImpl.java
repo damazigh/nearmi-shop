@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.nearmi.core.mongo.document.MiProUser;
 import org.nearmi.core.mongo.document.shopping.Product;
 import org.nearmi.core.mongo.document.shopping.Shop;
+import org.nearmi.core.mongo.document.technical.ImageMetadata;
 import org.nearmi.core.repository.MiProUserRepository;
 import org.nearmi.core.security.CoreSecurity;
 import org.nearmi.core.service.impl.UploadService;
@@ -49,17 +50,24 @@ public class ProProductServiceImpl implements IProProductService {
         positiveNumber(productDto.getPrice(), "product price");
         MiProUser proUser = proUserRepository.findByUsername(CoreSecurity.token().getPreferredUsername());
         Shop shop = ShopValidator.validateShopBelongToUser(proUser, shopId);
-        Product product = new Product();
+        Product product = new Product(shop);
         product.setDescription(productDto.getDescription());
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
         product.setAmount(productDto.getInitialAmount());
-        List<String> metadata = Arrays.stream(files).map(file -> uploadService.upload(file, proUser.getId(), shopId, acceptedMime))
-                .collect(Collectors.toList());
+        List<ImageMetadata> metadata = Arrays.stream(files).map(file -> {
+            String path = uploadService.upload(file, proUser.getId(), shopId, acceptedMime);
+            return new ImageMetadata(proUser.getId(), false, path, 0, 0);
+        }).collect(Collectors.toList());
         product.setMetadata(metadata);
         shop.getProducts().add(product);
         Product saved = productRepository.save(product);
         shopRepository.save(shop);
         return saved.getId();
+    }
+
+    @Override
+    public boolean isUnique(String field, String value, String shopId) {
+        return productRepository.isUnique(value, field, shopId);
     }
 }
