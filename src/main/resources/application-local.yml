@@ -32,7 +32,9 @@ nearmi:
     debugSecurity: false
     max-distance: 10000.0
     #accepted mime type for images
-    acceptedImageMime: 'image/jpeg, image/png'
+    acceptedImageMime: image/jpeg, image/png
     dataPath: 'C:\nearmi-data'
     max-image-for-shop: 15
     enable-dev-cors: true
+    #list of sub-folders where product image will be stored
+    product-image-sub-folders: products
