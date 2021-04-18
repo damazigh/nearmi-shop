@@ -40,4 +40,12 @@ public interface IProProductService {
      * @return true if the value doesn't exist false either
      */
     boolean isUnique(String field, String value, String shopId);
+
+    /**
+     * delete a product belonging to a shop with its id
+     *
+     * @param shopId    targeted shop
+     * @param productId targeted product
+     */
+    void delete(String shopId, String productId);
 }

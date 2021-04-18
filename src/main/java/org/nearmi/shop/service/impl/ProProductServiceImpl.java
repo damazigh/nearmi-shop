@@ -2,12 +2,14 @@ package org.nearmi.shop.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.nearmi.core.dto.technical.PaginatedSearchResult;
+import org.nearmi.core.exception.MiException;
 import org.nearmi.core.mongo.document.MiProUser;
 import org.nearmi.core.mongo.document.shopping.Product;
 import org.nearmi.core.mongo.document.shopping.ProductCategory;
 import org.nearmi.core.mongo.document.shopping.Shop;
 import org.nearmi.core.mongo.document.technical.ImageMetadata;
 import org.nearmi.core.repository.MiProUserRepository;
+import org.nearmi.core.resource.GeneralResKey;
 import org.nearmi.core.security.CoreSecurity;
 import org.nearmi.core.service.impl.UploadService;
 import org.nearmi.shop.dto.in.CreateProductDto;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.nearmi.core.validator.Validator.*;
 
@@ -108,6 +111,22 @@ public class ProProductServiceImpl implements IProProductService {
     @Override
     public boolean isUnique(String field, String value, String shopId) {
         return productRepository.isUnique(value, field, shopId);
+    }
+
+    @Override
+    public void delete(String shopId, String productId) {
+        log.info("requested deletion of product {} belonging to shop with id {}", productId, shopId);
+        log.debug("validating that shop belong to user");
+        MiProUser proUser = proUserRepository.findByUsername(CoreSecurity.token().getPreferredUsername());
+        Shop targetedShop = ShopValidator.validateShopBelongToUser(proUser, shopId);
+        log.debug("validating request product exist in shop");
+        Optional<Product> optionalProduct = productRepository.findByIdAndProductOwnerId(productId, shopId);
+        if (optionalProduct.isEmpty()) {
+            throw new MiException(GeneralResKey.NMI_G_0010);
+        }
+        log.debug("product found and belong to actual shop");
+        productRepository.delete(optionalProduct.get());
+        log.info("product {} deleted", productId);
     }
 
     @PostConstruct

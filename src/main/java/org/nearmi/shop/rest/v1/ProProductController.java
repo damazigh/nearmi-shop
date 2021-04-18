@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +32,10 @@ public class ProProductController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
- 
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable("shopId") String shopId, @PathVariable("productId") String productId) {
+        proProductService.delete(shopId, productId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

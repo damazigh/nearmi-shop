@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author adjebarri
  * @since 0.1.0
@@ -22,4 +24,13 @@ public interface ProductRepository extends MongoRepository<Product, String>, Pro
      * @return {@link Page} of {@link Product}
      */
     Page<Product> findByProductOwnerId(String shopId, Pageable pageable);
+
+    /**
+     * find a product by it's id and product owner id
+     *
+     * @param id             of the product
+     * @param productOwnerId shop that owns the product
+     * @return the product if found else @{code {@link Optional#empty()}}
+     */
+    Optional<Product> findByIdAndProductOwnerId(String id, String productOwnerId);
 }
