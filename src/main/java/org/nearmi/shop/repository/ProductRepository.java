@@ -33,4 +33,6 @@ public interface ProductRepository extends MongoRepository<Product, String>, Pro
      * @return the product if found else @{code {@link Optional#empty()}}
      */
     Optional<Product> findByIdAndProductOwnerId(String id, String productOwnerId);
+
+    Optional<Product> findByNameAndProductOwnerId(String name, String productOwnerId);
 }

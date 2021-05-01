@@ -19,6 +19,7 @@ public class ShopSecurityConfig extends SecurityConfig {
                         "/v1/config",
                         "/v1/search*",
                         "/v1/*/image/*",
+                        "/v1/*/product/*/image/*",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
