@@ -37,3 +37,4 @@ nearmi:
     max-image-for-shop: 15
     #list of sub-folders where product image will be stored
     product-image-sub-folders: products
+    
